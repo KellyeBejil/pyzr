@@ -175,7 +175,7 @@ class TungeeCrawler:
         
         self.playwright = await async_playwright().start()
         self.browser = await self.playwright.chromium.launch(
-            headless=False,
+            headless=True,
             args=['--no-sandbox', '--disable-setuid-sandbox', '--start-maximized']
         )
         self.page = await self.browser.new_page()
