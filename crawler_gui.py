@@ -13,6 +13,7 @@ import json
 import os
 import re
 import asyncio
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 import openpyxl
@@ -161,9 +162,17 @@ class TungeeCrawler:
         print(log_message)
         if self.log_callback:
             self.log_callback(log_message)
-    
+
     async def init_browser(self):
         """初始化浏览器"""
+        # 如果是打包环境，设置浏览器路径
+        if getattr(sys, 'frozen', False):
+            # 获取临时解压目录
+            base_path = sys._MEIPASS
+            # 设置 PLAYWRIGHT_BROWSERS_PATH 环境变量指向解压后的 browsers 目录
+            os.environ["PLAYWRIGHT_BROWSERS_PATH"] = os.path.join(base_path, "browsers")
+            self.log(f"运行在打包模式，浏览器路径: {os.environ['PLAYWRIGHT_BROWSERS_PATH']}")
+        
         self.playwright = await async_playwright().start()
         self.browser = await self.playwright.chromium.launch(
             headless=False,

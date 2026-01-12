@@ -22,11 +22,20 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pyinstaller playwright openpyxl
-        playwright install chromium
-    
-    - name: Build EXE
+
+    - name: Install Playwright Browsers
+      shell: bash
       run: |
-        pyinstaller --onefile --windowed --name "TungeeCrawler" crawler_gui.py
+        # 设置安装路径为当前目录下的 browsers 文件夹
+        export PLAYWRIGHT_BROWSERS_PATH=$PWD/browsers
+        playwright install chromium
+        echo "Installing browsers to $PLAYWRIGHT_BROWSERS_PATH"
+        ls -R browsers
+
+    - name: Build EXE
+      # Windows use ; for separator
+      run: |
+        pyinstaller --onefile --windowed --name "TungeeCrawler" --add-data "browsers;browsers" crawler_gui.py
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
